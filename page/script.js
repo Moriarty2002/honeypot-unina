@@ -82,14 +82,14 @@ Login.submitLoginRequest = function () {
 
   // --- Save credentials in file for UART transfer ---
   // TODO: js doens't allow to save file locally, check how to do it
-  const uartData = `USER=${userName.value}\r\nPASS=${password.value}\r\n`;
-  const blob = new Blob([uartData], { type: 'text/plain' });
-  const downloadLink = document.createElement('a');
-  downloadLink.href = URL.createObjectURL(blob);
-  downloadLink.download = 'credentials.txt';
-  document.body.appendChild(downloadLink);
-  downloadLink.click();
-  document.body.removeChild(downloadLink);
+  // const uartData = `USER=${userName.value}\r\nPASS=${password.value}\r\n`;
+  // const blob = new Blob([uartData], { type: 'text/plain' });
+  // const downloadLink = document.createElement('a');
+  // downloadLink.href = URL.createObjectURL(blob);
+  // downloadLink.download = 'credentials.txt';
+  // document.body.appendChild(downloadLink);
+  // downloadLink.click();
+  // document.body.removeChild(downloadLink);
   // ---------------------------------------
 
   document.forms['loginForm'].submit(); // Fake submission
