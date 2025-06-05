@@ -38,7 +38,10 @@ def send_command():
                 break
             if msg.lower() == "stop":
                 msg = "stop_"
-            ser.write((msg).encode())
+            if msg.lower() in ["start", "stop"]:
+                ser.write((msg).encode())
+            else:
+                print(f"[ERROR] Command not available.")  
     except KeyboardInterrupt:
         pass
 
