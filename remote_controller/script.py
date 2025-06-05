@@ -38,7 +38,7 @@ def send_command():
                 break
             if msg.lower() == "stop":
                 msg = "stop_"
-            if msg.lower() in ["start", "stop"]:
+            if msg.lower() in ["start", "stop_"]:
                 ser.write((msg).encode())
             else:
                 print(f"[ERROR] Command not available.")  
