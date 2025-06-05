@@ -3,7 +3,7 @@ import threading
 import time
 
 # config parameters
-SERIAL_PORT = "/dev/rfcomm0"
+SERIAL_PORT = "COM7"
 BAUD_RATE = 9600
 OUTPUT_FILE = "credentials.txt"
 
@@ -36,7 +36,9 @@ def send_command():
             msg = input("[>>] ")
             if msg.lower() in ["exit", "quit"]:
                 break
-            ser.write((msg + "\n").encode())
+            if msg.lower() == "stop":
+                msg = "stop_"
+            ser.write((msg).encode())
     except KeyboardInterrupt:
         pass
 
@@ -50,4 +52,3 @@ send_command()
 # close serial
 ser.close()
 print("\n[CLOSED] Serial connection closed.")
-
