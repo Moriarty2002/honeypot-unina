@@ -43,13 +43,12 @@ def main():
     
     print(f"[STARTED] Script for serial communication.")
     print(f"[INFO] Operating System: {args.operating_system}")
-    print(f"[INFO] Serial Porta: {SERIAL_PORT}")
+    print(f"[INFO] Serial Port: {SERIAL_PORT}")
 
     # open serial connection
     try:
         ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
         print(f"[OK] Serial connection started")
-        print(f"[OK] Connected to {SERIAL_PORT}")
     except Exception as e:
         print(f"[ERROR] Failed to start serial connection: {e}")
         exit(1)
