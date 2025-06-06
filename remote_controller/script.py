@@ -11,7 +11,7 @@ def parse_arguments():
     # os parameter
     parser.add_argument('-os', '--operating-system', 
                        choices=['linux', 'win', 'mac'],
-                       default='win',,
+                       default='win',
                        help='Select Operating System (linux, win, mac)')
     
     # port parameter
