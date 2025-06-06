@@ -60,7 +60,8 @@ void submit_handler() {
 
         preferences.end();
 
-        http_server.send(200, "text/plain", "Login success");
+        http_server.sendHeader("Location", "/");
+        http_server.send(302, "text/plain", "Fake redirection");
     } else {
         http_server.send(405, "text/plain", "Method Not Allowed");
     }
