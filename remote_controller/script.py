@@ -77,7 +77,7 @@ def main():
                 if msg.lower() == "stop":
                     msg = "stop_"
                 if msg.lower() in ["start", "stop_"]:
-                    ser.write((msg).encode())
+                    ser.write((msg + "\n").encode())
                 else:
                     print(f"[ERROR] Command not available.")  
         except KeyboardInterrupt:
