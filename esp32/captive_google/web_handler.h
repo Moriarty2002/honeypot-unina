@@ -4,7 +4,7 @@
 extern WebServer http_server;
 extern DNSServer dns_server; 
 
-// this function setup all the routes for the evil twin. //
+// this function setup all the routes for the Honeypot Unina. //
 void setup_web_handler();
 
 // this function activates everytime user try to navigate on web. //

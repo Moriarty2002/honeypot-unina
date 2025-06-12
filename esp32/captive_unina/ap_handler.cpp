@@ -18,7 +18,7 @@ void ap_start() {
     http_server.begin();
     ap_active = true;
 
-    Serial.println("[INFO] Evil Twin Started");
+    Serial.println("[INFO] Honeypot Unina Started");
     Serial.println("[INFO] IP Address:");
     Serial.print(WiFi.softAPIP());
 }
@@ -29,7 +29,7 @@ void ap_stop() {
     WiFi.softAPdisconnect(true);
     ap_active = false;
 
-    Serial.println("[INFO] Evil Twin Stopped");
+    Serial.println("[INFO] Honeypot Unina Stopped");
 }
 
 bool ap_is_active() {
