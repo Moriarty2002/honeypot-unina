@@ -60,7 +60,7 @@ def main():
                     data = ser.readline().decode(errors="ignore").strip()
                     if data:
                         timestamp = time.strftime("[%Y-%m-%d %H:%M:%S]")
-                        print(f"\n[<<] {data}")
+                        #print(f"\n[<<] {data}")
                         f.write(f"{timestamp} {data}\n")
                         f.flush()
                 except Exception as e:
