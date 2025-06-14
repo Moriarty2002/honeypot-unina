@@ -46,18 +46,22 @@ UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
-uint8_t USART1_RXBuffer[USART1_BUFFER_SIZE];
+uint8_t USART1_RXBuffer[USART1_BUFFER_SIZE] = {0};
 uint8_t USART1_TXBuffer[USART3_BUFFER_SIZE];
 uint16_t USART1_TXidx = 0;
 
-uint8_t USART3_RXBuffer[USART3_BUFFER_SIZE];
+uint8_t USART3_RXBuffer[USART3_BUFFER_SIZE] = {0};
 uint8_t USART3_RXByte;
 uint8_t USART3_TXBuffer[USART1_BUFFER_SIZE];
-uint16_t USART3_RXidx = 0;						// credentials are received 1 byte per time, so i need index
-volatile uint8_t USART3_RXBufferFull = 0;
+uint16_t USART3_RXidx = 0;							// credentials are received 1 byte per time, so i need index
+uint8_t USART3_RXBufferFull = 0;
 
-uint8_t flag_on = 0;
-uint8_t flag_creds = 0;
+uint8_t flag_on = 0;								// flag status on
+uint8_t flag_command = 0;							// flag for received command
+uint8_t flag_creds = 0;								// flag for received credentials
+
+uint8_t flag_uart1_error = 0;						// flag for error on uart1 reception
+uint8_t flag_uart3_error = 0;						// flag for error on uart3 reception
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -106,8 +110,22 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_SET);			// turn blue led on
-  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);			// turn blue led on
+  HAL_Delay(100);
+
+  // FLUSH DATA FROM USART1 AND USART3
+  while (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE)) {
+      uint8_t dummy;
+      HAL_UART_Receive(&huart1, &dummy, 1, 50);
+  }
+
+  while (__HAL_UART_GET_FLAG(&huart3, UART_FLAG_RXNE)) {
+      uint8_t dummy;
+      HAL_UART_Receive(&huart3, &dummy, 1, 50);
+  }
+
+  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_SET);					// keep blue led on (FNS)
+  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_RESET);				// init green led off
+  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);					// init red led off
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -117,19 +135,43 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_RESET);
-	  while(flag_on == 1) {
-		  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_SET);			// turn green led on
-
-		  if(flag_creds == 1) {
-			  	flag_creds = 0;
-				USART1_TXidx = strlen((char*)USART3_RXBuffer);
-				memcpy(USART1_TXBuffer, USART3_RXBuffer, USART1_TXidx);				// copy received command in TX buffer
-				HAL_UART_Transmit_IT(&huart1, USART1_TXBuffer, USART1_TXidx);		// start transmission on interrupt
-		  }
-
+	  if(flag_on == 1) {
+		  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_SET);					// keep green led on
 	  }
+	  if(flag_on == 0) {
+		  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_RESET);				// keep green led off
+		  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);					// keep red led off
+	  }
+
+	  if(flag_command == 1) {
+		  // SEND COMMAND VIA USART 3
+		  flag_command = 0;
+		  HAL_Delay(10);																		// to stabilize USART
+		  memcpy(USART3_TXBuffer, USART1_RXBuffer, USART1_BUFFER_SIZE);							// copy received command in TX buffer
+		  HAL_UART_Transmit_IT(&huart3, USART3_TXBuffer, USART1_BUFFER_SIZE);					// start transmission on interrupt
+	  }
+
+	  if(flag_creds == 1) {
+			// SEND CREDENTIALS VIA USART 1
+			flag_creds = 0;
+			HAL_Delay(10);																		// to stabilize USART
+			/*
+			// OLD CREDS TRANSMIT
+			USART1_TXidx = strlen((char*)USART3_RXBuffer);
+			memcpy(USART1_TXBuffer, USART3_RXBuffer, USART1_TXidx);								// copy received command in TX buffer
+			HAL_UART_Transmit_IT(&huart1, USART1_TXBuffer, USART1_TXidx);						// start transmission on interrupt
+			*/
+			sprintf((char*)USART1_TXBuffer, "<%s>\n", (char*)USART3_RXBuffer);
+			USART1_TXidx = strlen((char*)USART1_TXBuffer);
+			HAL_UART_Transmit_IT(&huart1, USART1_TXBuffer, USART1_TXidx);
+	  }
+
+	  if(flag_uart1_error == 1 || flag_uart3_error == 1) {
+		  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);				// keep red led on
+	  }
+
   }
+
   /* USER CODE END 3 */
 }
 
@@ -210,7 +252,7 @@ static void MX_USART1_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART1_Init 2 */
-  HAL_UART_Receive_IT(&huart1, USART1_RXBuffer, USART1_BUFFER_SIZE);		// enable reception on USART1 (full command)
+  HAL_UART_Receive_IT(&huart1, USART1_RXBuffer, USART1_BUFFER_SIZE);
   /* USER CODE END USART1_Init 2 */
 
 }
@@ -231,7 +273,7 @@ static void MX_USART3_UART_Init(void)
 
   /* USER CODE END USART3_Init 1 */
   huart3.Instance = USART3;
-  huart3.Init.BaudRate = 9600;
+  huart3.Init.BaudRate = 115200;
   huart3.Init.WordLength = UART_WORDLENGTH_8B;
   huart3.Init.StopBits = UART_STOPBITS_1;
   huart3.Init.Parity = UART_PARITY_NONE;
@@ -245,7 +287,7 @@ static void MX_USART3_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART3_Init 2 */
-  HAL_UART_Receive_IT(&huart3, &USART3_RXByte, 1);							// enable reception on USART3 (1 byte)
+  HAL_UART_Receive_IT(&huart3, USART3_RXBuffer, 1);						// credentials are received 1 char per time
   /* USER CODE END USART3_Init 2 */
 
 }
@@ -299,14 +341,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : SPI1_SCK_Pin SPI1_MISO_Pin SPI1_MISOA7_Pin */
-  GPIO_InitStruct.Pin = SPI1_SCK_Pin|SPI1_MISO_Pin|SPI1_MISOA7_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
   /*Configure GPIO pins : I2C1_SCL_Pin I2C1_SDA_Pin */
   GPIO_InitStruct.Pin = I2C1_SCL_Pin|I2C1_SDA_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
@@ -325,23 +359,24 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     if (huart->Instance == USART1)		// received command
     {
-        if (strncmp((char*)USART1_RXBuffer, "start\n", USART1_BUFFER_SIZE) == 0)
+    	if (strncmp((char*)USART1_RXBuffer, "start\n", USART1_BUFFER_SIZE) == 0)
         {
         	flag_on = 1;
+        	flag_command = 1;
         }
-        else if (strncmp((char*)USART1_RXBuffer, "stop_\n", USART1_BUFFER_SIZE) == 0)
+    	if (strncmp((char*)USART1_RXBuffer, "stop_\n", USART1_BUFFER_SIZE) == 0)
         {
         	flag_on = 0;
-        	flag_creds = 0;
+        	flag_command = 1;
         }
 
-    	memcpy(USART3_TXBuffer, USART1_RXBuffer, USART1_BUFFER_SIZE);						// copy received command in TX buffer
-    	HAL_UART_Transmit_IT(&huart3, USART3_TXBuffer, USART1_BUFFER_SIZE);					// start transmission on interrupt
+    	flag_uart1_error = 0;
+    	flag_uart3_error = 0;
         HAL_UART_Receive_IT(&huart1, USART1_RXBuffer, USART1_BUFFER_SIZE);					// reset reception
     }
-    else if (huart->Instance == USART3)		// received a credentials char
+    if (huart->Instance == USART3)		// received a credentials char
     {
-        if (USART3_RXByte == '\n' || USART3_RXBufferFull == 1)
+        if (USART3_RXByte == '\n' || USART3_RXByte == '\r' || USART3_RXBufferFull == 1)
         {
             // all credentials char received or buffer full
         	USART3_RXBuffer[USART3_RXidx] = '\0';
@@ -358,7 +393,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
             }
         }
 
-        HAL_UART_Receive_IT(&huart3, &USART3_RXByte, 1);						// reset reception
+        HAL_UART_Receive_IT(&huart3, &USART3_RXByte, 1);								// reset reception
     }
 }
 
@@ -366,9 +401,29 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
 	if (huart->Instance == USART1)
 	{
-		//HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, GPIO_PIN_SET);			// orange led when transmission is finished (for debug)
+		memset(USART1_TXBuffer, 0, USART1_TXidx);
 		USART1_TXidx = 0;
 	}
+	if (huart->Instance == USART3)
+	{
+		memset(USART3_TXBuffer, 0, USART1_BUFFER_SIZE);
+	}
+}
+
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+	// in case of error reset reception
+    if (huart->Instance == USART1)
+    {
+        flag_uart1_error = 1;
+        HAL_UART_Receive_IT(&huart1, USART1_RXBuffer, USART1_BUFFER_SIZE);
+    }
+
+    if (huart->Instance == USART3)
+    {
+        flag_uart3_error = 1;
+        HAL_UART_Receive_IT(&huart3, &USART3_RXByte, 1);
+    }
 }
 /* USER CODE END 4 */
 

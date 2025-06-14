@@ -8,9 +8,7 @@
 // PIN setup
 #define TX 17
 #define RX 16
-#define BAUD_RATE 9600
-
-String received_command = "";
+#define BAUD_RATE 115200
 
 DNSServer dns_server;
 WebServer http_server(80);
@@ -25,24 +23,30 @@ void setup() {
 
   File root = SPIFFS.open("/");
   File file = root.openNextFile();
-  Serial.print("[SPIFFS] File uploaded on board: ");
-  while (file) {
-    Serial.println(file.name());
-    file = root.openNextFile();
-  }
+  Serial.println("[SPIFFS] File uploaded on board correctly.");
 
   Serial1.begin(BAUD_RATE, SERIAL_8N1, RX, TX);
-  Serial.println("[OK] Ready to receive command via Serial1 (USART).");
+  delay(100);
+  while (Serial.available()) {
+    Serial.read();
+  }
   
+  Serial1.flush();
+  Serial1.println("warmup");
+  delay(50);
+  Serial1.flush();  
+  
+  Serial.println("[OK] Ready to receive command via UART.");
 }
 
 void loop() {
 
+  static String received_command = "";
   while (Serial1.available()) {
     char c = Serial1.read();
     received_command += c;
 
-    if (c == '\n') {
+    if (c == '\n' || c == '\r') {
       received_command.trim();
       Serial.print("[INFO] Command received: ");
       Serial.println(received_command);

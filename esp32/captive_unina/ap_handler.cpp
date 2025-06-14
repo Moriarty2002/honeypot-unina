@@ -20,7 +20,7 @@ void ap_start() {
 
     Serial.println("[INFO] Honeypot Unina Started");
     Serial.println("[INFO] IP Address:");
-    Serial.print(WiFi.softAPIP());
+    Serial.println(WiFi.softAPIP());
 }
 
 void ap_stop() {

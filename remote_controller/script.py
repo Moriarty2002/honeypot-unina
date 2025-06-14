@@ -3,6 +3,7 @@ import threading
 import time
 import argparse
 import sys
+import re
 
 def parse_arguments():
     # parse arguments via command line
@@ -38,7 +39,7 @@ def main():
     
     # config parameters
     BAUD_RATE = 9600
-    OUTPUT_FILE = "credentials.txt"
+    OUTPUT_FILE = "creds.txt"
     SERIAL_PORT = configure_serial_port(args.operating_system, args.port)
     
     print(f"[STARTED] Script for serial communication.")
@@ -53,6 +54,7 @@ def main():
         print(f"[ERROR] Failed to start serial connection: {e}")
         exit(1)
 
+    """
     def receive_data():
         with open(OUTPUT_FILE, "a") as f:
             while True:
@@ -60,9 +62,41 @@ def main():
                     data = ser.readline().decode(errors="ignore").strip()
                     if data:
                         timestamp = time.strftime("[%Y-%m-%d %H:%M:%S]")
-                        #print(f"\n[<<] {data}")
+                        print(f"\n[<<] {data}")
                         f.write(f"{timestamp} {data}\n")
                         f.flush()
+                except Exception as e:
+                    print(f"[ERROR] Failed to receive data: {e}")
+                    break
+    """
+
+    def receive_data():
+        buffer = ""  # init buffer
+
+        with open(OUTPUT_FILE, "a") as f:
+            while True:
+                try:
+                    data = ser.read(ser.in_waiting or 1).decode(errors="ignore")
+                    if data:
+                        buffer += data
+
+                        while "<" in buffer and ">" in buffer:
+                            start = buffer.find("<")
+                            end = buffer.find(">", start)
+
+                            if end > start:
+                                message = buffer[start + 1:end].strip() 
+                                
+                                # skip empty message
+                                if message:
+                                    timestamp = time.strftime("[%Y-%m-%d %H:%M:%S]")
+                                    print(f"\n[<<] {message}")
+                                    f.write(f"{timestamp} {message}\n")
+                                    f.flush()
+                                
+                                buffer = buffer[end + 1:]
+                            else:
+                                break
                 except Exception as e:
                     print(f"[ERROR] Failed to receive data: {e}")
                     break
