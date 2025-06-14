@@ -5,7 +5,7 @@
 #include "web_handler.h"
 #include "ap_handler.h"
 
-const char *ap_ssid = "Wi-Fi UniNA";
+const char *ap_ssid = "WiFi-6 UniNA";
 const char *ap_password = "";
 const byte DNS_PORT = 53;
 
