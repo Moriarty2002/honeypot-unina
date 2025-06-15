@@ -1,4 +1,4 @@
-ST-Link Drivers
-ESP32 C120x Drivers
+ST-Link Drivers: https://www.st.com/en/development-tools/stsw-link009.html
+ESP32 CP210x Drivers: https://www.silabs.com/developer-tools/usb-to-uart-bridge-vcp-drivers
 
 SPIFFS (ESP32 file uploader plugin for old ARDUINO IDE): https://github.com/me-no-dev/arduino-esp32fs-plugin
