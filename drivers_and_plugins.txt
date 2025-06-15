@@ -1,4 +1,4 @@
 ST-Link Drivers
 ESP32 C120x Drivers
 
-SPIFFS (ESP32 file uploader plugin): https://github.com/me-no-dev/arduino-esp32fs-plugin
+SPIFFS (ESP32 file uploader plugin for ARDUINO IDE): https://github.com/me-no-dev/arduino-esp32fs-plugin

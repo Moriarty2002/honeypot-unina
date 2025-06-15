@@ -54,21 +54,21 @@ def main():
         print(f"[ERROR] Failed to start serial connection: {e}")
         exit(1)
 
-    """
-    def receive_data():
-        with open(OUTPUT_FILE, "a") as f:
-            while True:
-                try:
-                    data = ser.readline().decode(errors="ignore").strip()
-                    if data:
-                        timestamp = time.strftime("[%Y-%m-%d %H:%M:%S]")
-                        print(f"\n[<<] {data}")
-                        f.write(f"{timestamp} {data}\n")
-                        f.flush()
-                except Exception as e:
-                    print(f"[ERROR] Failed to receive data: {e}")
-                    break
-    """
+    
+    # def receive_data():
+    #     with open(OUTPUT_FILE, "a") as f:
+    #         while True:
+    #             try:
+    #                 data = ser.readline().decode(errors="ignore").strip()
+    #                 if data:
+    #                     timestamp = time.strftime("[%Y-%m-%d %H:%M:%S]")
+    #                     print(f"\n[<<] {data}")
+    #                     f.write(f"{timestamp} {data}\n")
+    #                     f.flush()
+    #             except Exception as e:
+    #                 print(f"[ERROR] Failed to receive data: {e}")
+    #                 break
+    
 
     def receive_data():
         buffer = ""  # init buffer
